@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<!-- Head -->
+<head th:replace="fragments :: page_head(${pageTitle} + ' | Circle')"></head>
+<!-- /Head -->
+
+<body class="dark">
+
+<!-- Navbar -->
+<div th:replace="fragments :: navigationNoSearch('Multimedia')"></div>
+<!-- /Navbar -->
+
+<!-- Content -->
+<div class="content-wrapper new-user">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 col-xs-10 col-sm-10">
+        <h3 class="heading" th:text="${pageTitle}"></h3>
+        <div class="login-window">
+          <form th:action="@{/users/save}" th:object="${user}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{id}"/>
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" class="form-control" th:field="*{firstName}" required>
+              </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" class="form-control" th:field="*{lastName}" required>
+              </div>
+            <div class="form-group">
+              <label for="userName">User Name</label>
+              <input type="text" class="form-control" th:field="*{userName}" required oninput="checkUserNameUnique(this)">
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input th:if="${user.id == null}" type="password" class="form-control"
+                     th:field="*{password}" required>
+              <input th:if="${user.id != null}" type="password" class="form-control"
+                     th:field="*{password}"
+                     placeholder="Lave blank if you don't want to change password">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" th:field="*{email}" required
+                     oninput="checkEmailUnique(this)">
+            </div>
+            <div class="form-group">
+              <label for="role">Role</label>
+            <select class="form-control" th:field="*{role}" style="padding: 10px;">
+              <th:block th:each="role : ${listRoles}">
+                <option th:value="${role.id}">[[${role.roleName}]]</option>
+              </th:block>
+            </select>
+            </div>
+            <div class="form-group">
+              <div class="checkbox">
+                <input class="custcheck" type="checkbox" th:field="*{enabled}">
+                <label style="margin-top: 6px" th:for="${#ids.prev('enabled')}">Enabled</label>
+              </div>
+            </div>
+            <h5 class="heading">Profile picture</h5>
+            <div class="form-group row">
+              <div class="col-lg-8 fileBrowser">
+                <input type="hidden" th:field="*{profileImage}">
+                <input type="file" id="fileImage" name="image" accept="image/jpeg, image/png">
+                <img th:src="@{${user.profileImagePath}}" alt="Image preview" id="thumbnail">
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2">
+                <button type="submit" class="btn btn-cv1">Save</button>
+              </div>
+              <div class="col-lg-2">
+                <button type="button" class="btn btn-cv2" id="cancelButton">Cancel</button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Modal Unique Email begin -->
+
+          <div class="modal fade" id="modalDialog">
+            <div class="modal-dialog modal-confirm">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <div class="icon-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                  </div>
+                  <h3 class="modal-title" id="modalTitle">Warning</h3>
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <span id="modalBody"></span>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- /Modal Unique Email end -->
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Content -->
+
+
+<!-- footer -->
+<footer th:replace="fragments :: footer('/home')"></footer>
+<!-- /footer -->
+
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/custom.js}"></script>
+<script type="text/javascript">
+
+  function checkUserNameUnique(confirmUserName) {
+    var url = "[[@{/users/check_username}]]";
+    var userName = $("#userName").val();
+    var userId = $("#id").val();
+    var params = {id: userId, userName: userName};
+
+    $.post(url, params, function (response) {
+      if (response === "OK") {
+        confirmUserName.setCustomValidity("");
+      } else if (response === "Duplicated") {
+        confirmUserName.setCustomValidity(
+            "User " + userName + " already exists!");
+      } else {
+        showModalDialog("Error", "Unknown response from server");
+      }
+    }).fail(function () {
+      showModalDialog("Error", "Could not connect to the server");
+    });
+    return false;
+  }
+
+  function checkEmailUnique(confirmEmail) {
+    var url = "[[@{/users/check_email}]]";
+    var email = $("#email").val();
+    var userId = $("#id").val();
+    var params = {id: userId, email: email};
+
+    $.post(url, params, function (response) {
+      if (response === "OK") {
+        confirmEmail.setCustomValidity("");
+      } else if (response === "Duplicated") {
+        confirmEmail.setCustomValidity("Email " + email + " already exists!");
+      } else {
+        showModalDialog("Error", "Unknown response from server");
+      }
+    }).fail(function () {
+      showModalDialog("Error", "Could not connect to the server");
+    });
+    return false;
+  }
+
+  function showModalDialog(title, message) {
+    $("#modalTitle").text(title);
+    $("#modalBody").text(message);
+    $("#modalDialog").modal();
+  }
+
+</script>
+
+
+</body>
+</html>

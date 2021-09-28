@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Head -->
+<head th:replace="fragments :: page_head('Login | Circle Media')"></head>
+<!-- /Head -->
+
+<body class="dark">
+
+<!-- Content -->
+<div class="container-fluid bg-image">
+    <div class="row">
+        <div class="login-wraper">
+            <img th:src="@{/images/login.jpg}" alt="login image">
+            <div class="banner-text">
+                <div class="line"></div>
+                <div class="b-text">
+                    Watch <span class="color-active">medias</span><br>created by<br><span class="color-b1">V</span><span class="color-b2">T</span><span class="color-b3">Š</span><span class="color-active"> students</span>.
+                </div>
+            </div>
+            <div class="login-window">
+                <div class="l-head">
+                    Log Into Your Circle Account
+                </div>
+                <div class="l-form">
+                    <form th:action="@{/login}" method="post">
+                        <div th:if="${param.error}">
+                            <p class="color-active">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+                        </div>
+                        <div th:if="${param.logout}">
+                            <p class="text-warning">You have been logged out.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="userName">User Name</label>
+                            <input type="text" class="form-control" id="userName" name="userName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <label class="checkbox">
+                                    <input type="checkbox" name="remember-me">
+                                    <span class="arrow"></span>
+                                </label> <span>Remember me on this computer</span>
+                                <span class="text2">(not recomended on public or shared computers)</span>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-7"><button type="submit" class="btn btn-cv1" >Login</button></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 guest">
+                                <a th:href="@{/guest/home}" style="color: #b1b1b1">Enter as Guest</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Content -->
+
+
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+
+</body>
+</html>

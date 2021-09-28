@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments :: page_head(${pageTitle})"></head>
+<!-- /Head -->
+
+<body class="single-media dark">
+<!-- Navbar -->
+<div th:replace="fragments :: navigation('Pictures', 'pictures')"></div>
+<!-- /Navbar -->
+
+
+<div class="content-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-xs-12 col-sm-12">
+                <div class="sv-media" >
+                    <img th:src="@{${picture.picturePath}}" width="100%" >
+                </div>
+                <h1 class="heading" th:text="${picture.title}"></h1>
+                <div class="author">
+                    <a th:href="@{|/pictures/userPictures/${picture.user.id}|}" >
+                        <img th:src="@{${picture.user.profileImagePath}}" class="sv-avatar" alt="Profile image">
+                    </a>
+                    <div class="sv-name">
+                        <div>
+                            <a th:href="@{|/pictures/userPictures/${picture.user.id}|}" th:text="${picture.user.fullUserName}"></a>
+                            <p th:text="${countPicturesByUser} + '&nbsp;&nbsp;Pictures'"></p>
+                        </div>
+                    </div>
+                    <div class="sv-views" id="voteSection"
+                         th:with="ratingLikeSum=${picture.getLikeRatingSum()},
+                                   ratingDislikeSum=${picture.getDislikeRatingSum()},
+                                   calculatedPercent=${picture.calculatedPercent()},
+                                   userLikeVoteValue=${picture.getUserLikeVoteValue(loggedInUser)},
+                                   userDislikeVoteValue=${picture.getUserDislikeVoteValue(loggedInUser)}">
+                        <div class="sv-views-progress" data-toggle="tooltip" data-placement="top" th:title="${picture.calculatedPercent()} + '%'">
+                            <div class="sv-views-progress-bar" th:style="'width: ' + ${calculatedPercent} + '%' + ';'" ></div>
+                        </div>
+                        <div class="sv-views-stats">
+                            <a class="rating-arrow like-arrow"
+                                th:attr="data-action=${userLikeVoteValue == 0} ? 'vote' : '', data-href=@{|/pictures/watch/rate/${picture.id}/like|}"
+                                th:classappend="${userLikeVoteValue == 1} ? 'voted'"
+                                data-vote-type="like">
+                                <i class="fas fa-thumbs-up"></i>
+                            </a>
+                            <span class="rating-value-like" th:text="${ratingLikeSum}"
+                                  th:classappend="${ratingLikeSum == 0} ? 'rating-value-no' : 'rating-value-positive'"></span>
+                            <a class="rating-arrow dislike-arrow"
+                                th:attr="data-action=${userDislikeVoteValue == 0} ? 'vote' : '', data-href=@{|/pictures/watch/rate/${picture.id}/dislike|}"
+                                th:classappend="${userDislikeVoteValue == 1} ? 'voted'"
+                                data-vote-type="dislike">
+                                <i class="fas fa-thumbs-down"></i>
+                            </a>
+                            <span class="rating-value-dislike" th:text="${ratingDislikeSum}"
+                                  th:classappend="${ratingDislikeSum == 0} ? 'rating-value-no' : 'rating-value-negative'"></span>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="info">
+                    <h4>Description:</h4>
+                    <p th:text="${picture.description}"></p>
+                    <h4>Category:</h4>
+                    <p class="sv-tags">
+                        <span th:text="${picture.category}" style="color: #b3b3b3"></span>
+                    </p>
+                    <div class="row date-lic">
+                        <div class="col-lg-6">
+                            <h4>Posted:</h4>&nbsp;
+                            <p th:text="${#temporals.format(picture.createdAt, 'dd-MMM-YYY &bull; HH:mm')}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Comments container -->
+                    <div class="comments">
+                        <div class="reply-comment">
+                            <div class="rc-header" id="commentCount">
+                                <i class="far fa-comment"></i>
+                                <span class="semibold" th:text="${countComments}"></span>
+                                <span>&nbsp;Comments</span>
+                            </div>
+                            <div class="rc-ava">
+                                <a th:href="@{|/pictures/userPictures/${picture.user.id}|}" >
+                                    <img th:src="@{${#authentication.principal.profileImagePath}}" alt="">
+                                </a>
+                            </div>
+                            <div class="rc-comment">
+                                <form th:action="@{|/comment/pictureComment/save/${picture.id}|}" method="post" th:object="${newComment}" id="commentForm">
+                                    <textarea rows="3" th:field="*{text}" placeholder="Share what you think..." required></textarea >
+                                    <button type="submit">
+                                        <i class="cv fas fa-paper-plane"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <!-- Comments header -->
+                        <div class="comments-list" id="comment_header">
+                            <div class="cl-header" >
+                                <div class="c-nav">
+                                    <ul class="list-inline">
+                                        <li><a data-comment-sort-type="newest" th:attr="data-action='commentSort', data-href=@{|/pictures/watch/${picture.id}?commentSort=newest|}" id="newest" class="disabledLink active">Newest Comments</a></li>
+                                        <li><a data-comment-sort-type="oldest" th:attr="data-action='commentSort', data-href=@{|/pictures/watch/${picture.id}?commentSort=oldest|}" id="oldest" >Oldest Comments</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Comments list -->
+                            <div id="commentList">
+                                <p class="noRecords" th:if="${listAllCommentsByPicture.isEmpty()}">Be the first to comment!</p>
+                            <div class="cl-comment" th:each="comment : ${listAllCommentsByPicture}">
+                                <div class="cl-avatar"><a th:href="@{|/pictures/userPictures/${comment.user.id}|}">
+                                    <img th:src="@{${comment.user.profileImagePath}}" alt=""></a></div>
+                                <div class="cl-comment-text">
+                                    <div class="cl-name-date">
+                                        <a th:href="@{|/pictures/userPictures/${comment.user.id}|}" th:text="${comment.user.getFullUserName()}">
+                                        </a>&nbsp;&nbsp;<span th:text="${#temporals.format(comment.createdAt, 'dd-MMM-YYY &bull; HH:mm')}"></span></div>
+                                    <div class="cl-text" th:text="${comment.text}"></div>
+                                    <div class="cl-meta" th:if="${#authentication.principal.id == comment.user.id or
+                                    #authentication.principal.roleName == 'Assistant' or
+                                    #authentication.principal.roleName == 'Admin'}">
+                                        <span class="grey"></span>
+                                        <a th:attr="data-action='delete-comment', data-href=@{|/comment/pictureComment/delete/${comment.id}|}">Delete</a>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            </div>
+                            <!-- END Comments list -->
+                        </div>
+                        <!-- END Comments header -->
+                    </div>
+                    <!-- END Comments container -->
+                </div>
+            </div>
+
+            <!-- right column -->
+            <div class="col-lg-4 col-xs-12 col-sm-12">
+                <!-- up next -->
+                <div class="caption">
+                    <div class="left">
+                        <span style="color: #a5a5a5" >More Pictures</span >
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="list" id="listRightMedias">
+                    <div class="h-media row" th:each="picture : ${listAllPictures}">
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="v-img">
+                                <a th:href="@{|/pictures/watch/${picture.id}|}">
+                                    <img class="picture" th:src="@{${picture.getPicturePath()}}" alt="Picture thumbnail">
+                                </a>
+                                <div class="time" th:text="${picture.category}"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="v-desc">
+                                <a th:href="@{|/pictures/watch/${picture.id}|}" th:text="${picture.title}"></a>
+                            </div>
+                            <div class="v-views">
+                                <a th:href="@{|/pictures/userPictures/${picture.getUser().getId()}|}">
+                                    <span th:text="${picture.user.fullUserName}"></span>
+                                </a>
+                                <p th:text="${#temporals.format(picture.createdAt, 'dd-MMM-YYY &bull; HH:mm')}"></p>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <!-- END up next -->
+                <!-- load more -->
+                <div class="loadmore">
+                    <a>Show more Pictures</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- footer -->
+<footer th:replace="fragments :: footer('/home')"></footer>
+<!-- /footer -->
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/voting-comment.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+
+
+</body>
+</html>

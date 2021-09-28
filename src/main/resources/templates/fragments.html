@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<!-- Head Fragment -->
+<head th:fragment="page_head(title)">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Media service platform">
+  <meta name="author" content="Buru Csongor">
+  <link rel="icon" th:href="@{/images/favicon.png}">
+
+  <title th:text="${title}"></title>
+
+  <!-- Bootstrap core CSS -->
+  <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+
+  <!-- Theme CSS -->
+  <link th:href="@{/css/modal.css}" rel="stylesheet">
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+  <link th:href="@{/css/font-circle-video.css}" rel="stylesheet">
+
+  <!-- font-family: 'Hind', sans-serif; -->
+  <link href='https://fonts.googleapis.com/css?family=Hind:400,300,500,600,700|Hind+Guntur:300,400,500,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<!-- /Head Fragment -->
+
+<!-- Head Fragment -->
+<head th:fragment="page_head_guest(title)">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Media service platform">
+  <meta name="author" content="Buru Csongor">
+  <link rel="icon" th:href="@{/images/favicon.png}">
+
+  <title th:text="${title}"></title>
+
+  <!-- Bootstrap core CSS -->
+  <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+
+  <!-- Theme CSS -->
+  <link th:href="@{/css/style.css}" rel="stylesheet">
+
+  <!-- font-family: 'Hind', sans-serif; -->
+  <link href='https://fonts.googleapis.com/css?family=Hind:400,300,500,600,700|Hind+Guntur:300,400,500,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<!-- /Head Fragment -->
+<body>
+
+<!-- Navbar fragment -->
+<div th:fragment="navigation(activeSection, searchSection)" class="container-fluid" style="max-width: 1920px">
+  <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
+    <input type="submit">
+  </form>
+  <div class="row">
+    <div class="navbar-container">
+      <div class="container">
+        <div class="row">
+          <a class="navbar-brand" th:href="@{/home}"><img th:src="@{/images/logo.svg}" alt="Circle Media" class="logo"/></a>
+
+          <div class="col-lg-2 col-md-3 col-sm-4 col-xs-10">
+            <ul class="list-inline menu">
+              <li class="pages">
+                <a href="#" class="dropdown-toggle activeSection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="${activeSection}"></a>
+                <ul class="dropdown-menu dropdown-menu-left" style="left: 18px;">
+                  <li><a th:href="@{/pictures}">View Pictures</a></li>
+                  <li><a th:href="@{/presentations}">View Presentations</a></li>
+                  <li><a th:href="@{/videos}">View Videos</a></li>
+                </ul>
+              </li>
+              <li sec:authorize="hasAuthority('Admin')" class="pages">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Users</a>
+                <ul class="dropdown-menu dropdown-menu-right" style="left: 83px;">
+                  <li><a th:href="@{/users/new_user}">Create User</a></li>
+                  <li><a th:href="@{/users}">Manage Users</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-5 col-md-3 col-sm-7 col-xs-12">
+            <form th:action="@{|/${searchSection}/page/1|}">
+              <input type="hidden" name="sortField" th:value="createdAt"/>
+              <input type="hidden" name="sortDir" th:value="desc"/>
+              <div class="topsearch">
+                <div class="input-group">
+                  <input type="search" class="form-control"
+                         th:placeholder="'Search ' + ${searchSection} + ' by: Date, Title, Category, User'"
+                         aria-describedby="sizing-addon2" name="keyword" th:value="${keyword}">
+                  <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i>&nbsp;&nbsp;&nbsp;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-lg-4 col-md-5 col-sm-6 col-xs-10">
+
+            <div class="avatar pull-left">
+              <img th:src="@{${#authentication.principal.profileImagePath}}" alt="avatar"/>
+              <span class="status"></span>
+            </div>
+            <div class="selectuser pull-left">
+              <div class="btn-group pull-right dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span th:text="${#authentication.principal.fullName}"></span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" style="left: 10px;">
+                  <li><a th:href="@{/account}">Manage Account</a></li>
+                  <li><a th:href="@{/account/myPictures}">My Pictures</a></li>
+                  <li><a th:href="@{/account/myPresentations}">My Presentations</a></li>
+                  <li><a th:href="@{/account/myVideos}">My Videos</a></li>
+                  <li><a href="" id="logoutLink">Log out</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="selectuser pull-left">
+              <div class="btn-group pull-right dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span >Upload</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" style="left: 10px">
+                  <li><a th:href="@{/pictures/new}"><i class="cv fas fa-image"></i>Upload Picture</a></li>
+                  <li><a th:href="@{/presentations/new}"><i class="cv fas fa-file-powerpoint" ></i>Upload Presentation</a></li>
+                  <li><a th:href="@{/videos/new}"><i class="cv fas fa-video"></i>Upload Video</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Navbar fragment -->
+
+<!-- Navbar guest fragment -->
+<div th:fragment="navigationGuest(activeSection, searchSection)" class="container-fluid" style="max-width: 1920px">
+  <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
+    <input type="submit">
+  </form>
+  <div class="row">
+    <div class="navbar-container">
+      <div class="container">
+        <div class="row">
+          <a class="navbar-brand" th:href="@{/guest/home}"><img th:src="@{/images/logo.svg}" alt="Circle Media" class="logo"/></a>
+          <div class="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+            <ul class="list-inline menu">
+              <li class="pages">
+                <a href="#" class="dropdown-toggle activeSection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="${activeSection}"></a>
+                <ul class="dropdown-menu dropdown-menu-left" style="left: 18px;">
+                  <li><a th:href="@{/guest/pictures}">View Pictures</a></li>
+                  <li><a th:href="@{/guest/presentations}">View Presentations</a></li>
+                  <li><a th:href="@{/guest/videos}">View Videos</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-8 col-md-7 col-sm-6 col-xs-6">
+            <form th:action="@{|/guest/${searchSection}/page/1|}">
+              <input type="hidden" name="sortField" th:value="createdAt"/>
+              <input type="hidden" name="sortDir" th:value="desc"/>
+              <div class="topsearch">
+                <div class="input-group">
+                  <input type="search" class="form-control"
+                         th:placeholder="'Search ' + ${searchSection} + ' by: Date, Title, Category, User'"
+                         aria-describedby="sizing-addon2" name="keyword" th:value="${keyword}">
+                  <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i>&nbsp;&nbsp;&nbsp;
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+            <ul class="list-inline menu">
+              <li><a th:href="@{/login}">Login</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Navbar guest fragment -->
+
+<!-- Navbar no search fragment -->
+<div th:fragment="navigationNoSearch(activeSection)" class="container-fluid" style="max-width: 1920px">
+  <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
+    <input type="submit">
+  </form>
+  <div class="row">
+    <div class="navbar-container">
+      <div class="container">
+        <div class="row">
+          <a class="navbar-brand" th:href="@{/home}"><img th:src="@{/images/logo.svg}" alt="Circle Media" class="logo"/></a>
+          <div class="col-lg-7 col-md-6 col-sm-4 col-xs-5">
+            <ul class="list-inline menu">
+              <li class="pages">
+                <a href="#" class="dropdown-toggle activeSection" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:text="${activeSection}"></a>
+                <ul class="dropdown-menu dropdown-menu-left" style="left: 18px;">
+                  <li><a th:href="@{/pictures}">View Pictures</a></li>
+                  <li><a th:href="@{/presentations}">View Presentations</a></li>
+                  <li><a th:href="@{/videos}">View Videos</a></li>
+                </ul>
+              </li>
+              <li sec:authorize="hasAuthority('Admin')" class="pages">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Users</a>
+                <ul class="dropdown-menu dropdown-menu-right" style="left: 83px;">
+                  <li><a th:href="@{/users/new_user}">Create User</a></li>
+                  <li><a th:href="@{/users}">Manage Users</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-4 col-md-5 col-sm-6 col-xs-9">
+
+            <div class="avatar pull-left">
+              <img th:src="@{${#authentication.principal.profileImagePath}}" alt="avatar"/>
+              <span class="status"></span>
+            </div>
+            <div class="selectuser pull-left">
+              <div class="btn-group pull-right dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span th:text="${#authentication.principal.fullName}"></span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" style="left: 10px;">
+                  <li><a th:href="@{/account}">Manage Account</a></li>
+                  <li><a th:href="@{/account/myPictures}">My Pictures</a></li>
+                  <li><a th:href="@{/account/myPresentations}">My Presentations</a></li>
+                  <li><a th:href="@{/account/myVideos}">My Videos</a></li>
+                  <li><a href="" id="logoutLink">Log out</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="selectuser pull-left">
+              <div class="btn-group pull-right dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span >Upload</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" style="left: 10px">
+                  <li><a th:href="@{/pictures/new}"><i class="cv fas fa-image"></i>Upload Picture</a></li>
+                  <li><a th:href="@{/presentations/new}"><i class="cv fas fa-file-powerpoint" ></i>Upload Presentation</a></li>
+                  <li><a th:href="@{/videos/new}"><i class="cv fas fa-video"></i>Upload Video</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Navbar no search fragment -->
+
+<!-- Content list fragment -->
+<li th:fragment="content_list(fieldName, columnLabel, path)">
+  <a th:if="${sortField != fieldName}"
+     th:href="@{'/' + ${path} + '/page/' + ${currentPage} + '?sortField=' + ${fieldName} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}"
+     th:text="${columnLabel}"></a>
+  <a th:if="${sortField == fieldName}"
+     th:href="@{'/' + ${path} + '/page/' + ${currentPage} + '?sortField=' + ${fieldName} + '&sortDir=' + ${reverseSortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}"
+     th:class="${sortDir == 'asc' ? 'color-active' : 'color-active'}">[[${columnLabel}]]&nbsp;<span
+      th:if="${sortField == fieldName}"
+      th:class="${sortDir == 'asc' ? 'fas fa-sort-alpha-down fa-lg color-active' : 'fas fa-sort-alpha-up fa-lg color-active'}"></span></a>
+</li>
+<!-- Content list fragment -->
+
+<!-- Pagination fragment -->
+<div th:fragment="pagination(path)" th:if="${totalPages > 1}" class="v-pagination">
+  <ul class="list-inline">
+    <li th:class="${currentPage > 1 ? '' : 'disabledLink'}">
+      <a th:href="@{'/' + ${path} + '/page/1?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}"
+         data-toggle="tooltip" data-placement="top" title="First Page">
+        <div class="pages"><i class="cv fas fa-angle-double-left"></i></div>
+      </a>
+    </li>
+    <li th:class="${currentPage > 1 ? '' : 'disabledLink'}">
+      <a th:href="@{'/' + ${path} + '/page/' + ${currentPage - 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}"
+         data-toggle="tooltip" data-placement="top" title="Previous Page">
+        <div class="pages"><i class="cv fas fa-angle-left"></i></div>
+      </a>
+    </li>
+
+    <li th:class="${currentPage < totalPages ? '' : 'disabledLink'}">
+      <a th:href="@{'/' + ${path} + '/page/' + ${currentPage + 1} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}"
+         data-toggle="tooltip" data-placement="top" title="Next Page">
+        <div class="pages"><i class="cv fas fa-angle-right"></i></div>
+      </a>
+    </li>
+    <li th:class="${currentPage < totalPages ? '' : 'disabledLink'}">
+      <a th:href="@{'/' + ${path} + '/page/' + ${totalPages} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + ${keyword != null ? '&keyword=' + keyword : ''}}"
+         data-toggle="tooltip" data-placement="top" title="Last Page">
+        <div class="pages"><i class="cv fas fa-angle-double-right"></i></div>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<!-- /Pagination fragment -->
+
+<!-- Footer fragment -->
+<footer th:fragment="footer(home)">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="container padding-def">
+        <div class="col-lg-1  col-sm-2 col-xs-12 footer-logo">
+          <a class="navbar-brand" th:href="@{${home}}">
+            <img th:src="@{/images/logo.svg}" alt="Circle Media Service" class="logo"/></a>
+        </div>
+        <div class="col-lg-7  col-sm-7 col-xs-12">
+          <div class="f-links">
+            <ul class="list-inline">
+              <li><a href="https://www.vts.su.ac.rs/">VTŠ Home</a></li>
+              <li><a href="https://inzenjer.info/#section1">About VTŠ</a></li>
+              <li><a href="https://eref.vts.su.ac.rs/">VTŠ E-tabla</a></li>
+              <li><a href="https://webmail.vts.su.ac.rs/">VTŠ Mail</a></li>
+            </ul>
+          </div>
+          <div class="delimiter"></div>
+          <div class="f-copy">
+            <ul class="list-inline">
+              <li>Copyrights 2021 <a href="#">burucs.com</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-lg-offset-1 col-lg-3 col-sm-3 col-xs-12">
+          <div class="f-icon pull-left">
+            <a href="https://www.facebook.com/groups/216897481668346"><i class="fab fa-facebook-square"></i></a>
+          </div>
+          <div class="clearfix"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- /Footer fragment -->
+
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<!-- Head -->
+<head th:replace="fragments :: page_head('User List | Circle')"></head>
+<!-- /Head -->
+
+<body class="dark">
+
+<!-- Navbar -->
+<div th:replace="fragments :: navigationNoSearch('Multimedia')"></div>
+<!-- /Navbar -->
+
+
+<div th:if="${message != null}" class="alert alert-success text-center" id="success-alert">
+  [[${message}]]
+</div>
+
+<!-- Content -->
+<div class="content-wrapper">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 channels">
+        <div class="content-block">
+          <!-- Users header sort, search -->
+          <div class="cb-header">
+            <div class="row">
+              <div class="col-lg-8">
+                <ul class="list-inline">
+                  <li><h4 style="color: #ababab">Sort by: </h4></li>
+                  <a th:replace="fragments :: content_list('firstName', 'First Name', 'users')"></a>
+                  <a th:replace="fragments :: content_list('lastName', 'Last Name', 'users')"></a>
+                  <a th:replace="fragments :: content_list('userName', 'User name', 'users')"></a>
+                  <a th:replace="fragments :: content_list('email', 'E-mail', 'users')"></a>
+                  <a th:replace="fragments :: content_list('enabled', 'Enabled', 'users')"></a>
+                  <a th:replace="fragments :: content_list('role.roleName', 'Role', 'users')"></a>
+                </ul>
+              </div>
+              <div class="col-lg-4">
+                <div class="cb-search">
+                  <form th:action="@{/users/page/1}">
+                    <input type="hidden" name="sortField" th:value="${sortField}"/>
+                    <input type="hidden" name="sortDir" th:value="${sortDir}"/>
+                    <label>
+                      <input type="search" placeholder="Search Users..." required name="keyword" th:value="${keyword}"/>
+                      <i class="fa fa-search"></i>
+                    </label>
+                    <button type="submit" class="searchButton" value="Search"></button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /User header sort, search -->
+          <!-- List users -->
+          <div class="channels-content">
+            <h4 th:if="${totalItems > 0}" th:text="'Users list: ' + ${totalItems} + ' users, page ' + ${currentPage} + ' of ' + ${totalPages}"></h4>
+            <h4 th:unless="${totalItems > 0}">Users list: No users found</h4>
+            <div class="clearfix"></div>
+            <div class="theme-section">
+              <div class="row">
+                <div th:each="user : ${listUsers}" class="col-md-3 col-sm-4 col-xs-6">
+                  <div class="cns-block">
+                    <div class="cns-image">
+                      <img th:src="@{/images/banner-small.png}" alt="Banner image">
+                    </div>
+                    <div class="cns-img-small">
+                      <div class="cns-small-wrapp">
+                          <img th:src="@{${user.getProfileImagePath()}}" alt="Profile image"/>
+                      </div>
+                    </div>
+                    <div class="cns-info">
+                      <h5 th:text="${user.getFullUserName()}"></h5>
+                      <span th:text="${user.getRole()}"></span>
+                      <span th:text="${user.getUserName()}"></span>
+                      <span th:text="${user.getEmail()}"></span>
+                      <span th:if="${user.enabled == true}" class="fas fa-check-circle"
+                            style="color: #37ba60; padding: 5px 0;"
+                            data-toggle="tooltip" data-placement="top"
+                            title="User is Enabled"></span>
+                      <span th:if="${user.enabled == false}" class="fas fa-check-circle"
+                            style="color: #8c8c8d; padding: 5px 0;"
+                            data-toggle="tooltip" data-placement="top"
+                            title="User is Disabled"></span>
+                      <a class="fas fa-user-edit fa-2x editUser"
+                         th:href="@{|/users/edit/${user.id}|}"
+                         data-toggle="tooltip" data-placement="bottom"
+                         th:title="'Edit user: ' + ${user.getFullUserName()}"></a>
+                      <a class="fas fa-user-times fa-2x deleteUser"
+                         th:href="@{|/users/delete/${user.getId()}|}"
+                         data-toggle="tooltip" data-placement="bottom"
+                         th:title="'Delete user: ' + ${user.getFullUserName()}"
+                         th:userFullName="${user.getFullUserName()}"></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /List users -->
+        </div>
+      </div>
+
+      <!-- Pagination start-->
+      <div th:replace="fragments :: pagination('users')"></div>
+      <!--Pagination end-->
+
+    </div>
+  </div>
+</div>
+<!-- /Content -->
+
+<!-- Modal delete begin -->
+<div id="confirmModal" class="modal fade">
+  <div class="modal-dialog modal-confirm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="icon-box">
+          <i class="fas fa-times"></i>
+        </div>
+        <h4 class="modal-title">Are you sure?</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmText"></p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-danger" href="" id="yesButton">Yes</a>
+        <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Modal delete end -->
+
+<!-- footer -->
+<footer th:replace="fragments :: footer('/home')"></footer>
+<!-- /footer -->
+
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+
+</body>
+</html>

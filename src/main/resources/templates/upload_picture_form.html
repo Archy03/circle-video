@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<!-- Head -->
+<head th:replace="fragments :: page_head(${pageTitle})"></head>
+<!-- /Head -->
+
+<body class="dark">
+
+<!-- Navbar -->
+<div th:replace="fragments :: navigation('Pictures', 'pictures')"></div>
+<!-- /Navbar -->
+
+<div class="content-wrapper upload-page edit-page" >
+  <form th:action="@{/pictures/save}" th:object="${picture}" method="post" enctype="multipart/form-data">
+  <div class="container-fluid u-details-wrap">
+      <div class="container">
+            <div class="u-details">
+              <div class="row">
+                <div class="col-lg-12 ud-caption"><h4>Upload Details</h4></div>
+                <div class="col-lg-2">
+                  <i class="fas fa-image" style="font-size: 8em;"></i>
+                </div>
+                <div class="col-lg-10">
+
+                  <label class="file_group_label" for="media_file" id="media_file_label">
+                    <i class="cv fas fa-image"></i>
+                    <span id="media-label-text">Select Picture file</span>
+                  </label>
+                  <input type="file" data-media-category="picture" id="media_file" name="media_file" class="custom-file-input" accept=".jpg, .jpeg, .png" required>
+
+                </div>
+              </div>
+            </div>
+      </div>
+  </div>
+  <div class="container">
+        <div class="u-form">
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="form-group">
+                <label for="title">Picture Title</label>
+                <input type="text" class="form-control" th:field="*{title}" required maxlength="75">
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select class="form-control" th:field="*{category}">
+                  <th:block th:each="cat : ${listCategories}">
+                    <option th:value="${cat.id}">[[${cat.categoryName}]]</option>
+                  </th:block>
+                </select>
+              </div>
+            </div>
+            <div class="col-lg-12">
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control" th:field="*{description}" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+  </div>
+    <div class="u-area">
+      <button type="submit" class="btn btn-primary u-btn">Save</button>
+      <button type="button" id="cancelButton" class="btn btn-primary u-btn-cancel">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- footer -->
+<footer th:replace="fragments :: footer('/home')"></footer>
+<!-- /footer -->
+<script th:src="@{/js/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/custom.js}"></script>
+<script th:src="@{/js/custom-file-upload.js}"></script>
+
+</body>
+</html>

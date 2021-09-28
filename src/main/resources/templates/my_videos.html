@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<!-- Head -->
+<head th:replace="fragments :: page_head(${pageTitle})"></head>
+<!-- /Head -->
+
+<body class="channel dark">
+
+<!-- Navbar -->
+<div th:replace="fragments :: navigation('Videos', 'videos')"></div>
+<!-- /Navbar -->
+
+<div th:if="${message != null}" class="alert alert-success text-center" id="success-alert">
+    [[${message}]]
+</div>
+
+<!-- channel -->
+<div class="container-fluid">
+    <div class="row">
+        <div class="img">
+            <img th:src="@{/images/banner-big.png}" alt="" class="c-banner">
+            <div class="c-avatar">
+                <img th:src="@{${#authentication.principal.profileImagePath}}" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ///channel -->
+
+
+<div class="content-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="channel-details">
+                    <div class="row">
+                        <div class="col-lg-10 col-lg-offset-2 col-xs-12">
+                            <div class="c-details">
+                                <div class="c-name">
+                                    <span th:text="${#authentication.principal.fullName}"></span>
+                                </div>
+
+                                <div class="c-nav" id="userMediaSortHeader">
+                                    <ul class="list-inline">
+                                        <li><a data-media-sort-type="newest" th:attr="data-action='userMediaSort', data-href=@{|/account/myVideos?mediaSort=newest|}" id="newest" class="active disabledLink">Newest Videos</a></li>
+                                        <li><a data-media-sort-type="oldest" th:attr="data-action='userMediaSort', data-href=@{|/account/myVideos?mediaSort=oldest|}" id="oldest" >Oldest Videos</a></li>
+                                        <li><a data-media-sort-type="title" th:attr="data-action='userMediaSort', data-href=@{|/account/myVideos?mediaSort=title|}" id="title">Title</a></li>
+                                        <li><a data-media-sort-type="category" th:attr="data-action='userMediaSort', data-href=@{|/account/myVideos?mediaSort=category|}" id="category">Category</a></li>
+                                    </ul>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Featured Videos -->
+                <div class="content-block" >
+                    <div class="cb-header">
+                        <div class="row">
+                            <div class="col-lg-8 col-xs-12 col-sm-6">
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cb-content medialist" id="userMediaList">
+                        <div class="row">
+                            <p class="noRecords" th:if="${listAllMyVideos.isEmpty()}">No Videos found!</p>
+                            <div class=" col-lg-3 col-xs-6 mediaitem" th:each="video : ${listAllMyVideos}">
+                                <div class="b-media" th:with="calculatedPercent=${video.calculatedPercent()}">
+                                    <div class="v-img">
+                                        <a th:href="@{'/videos/watch/' + ${video.id}}">
+                                            <img th:src="@{${video.videoThumbnailPath}}" alt="">
+                                        </a>
+                                        <div class="time" th:text="${video.category}"></div>
+                                    </div>
+                                    <div class="v-desc">
+                                        <a th:href="@{'/videos/watch/' + ${video.id}}" th:text="${video.title}"></a>
+                                    </div>
+                                    <div class="v-views">
+                                        <span style="color: #969696" th:text="${#temporals.format(video.createdAt, 'dd-MMM-YYY &bull; HH:mm')}"></span>
+                                        <span th:if="${#authentication.principal.id == video.user.id}">
+                                           <a class="mediaDelete"
+                                              th:href="@{'/account/myVideos/delete/' + ${video.id}}"
+                                              th:title="${video.title}"
+                                              th:userFullName="${video.user.getFullUserName()}">Delete</a>
+                                        </span><br>
+                                        <span class="v-percent"><span class="v-circle"></span> [[${calculatedPercent}]]%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /Featured Videos -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal delete video begin -->
+<div id="confirmModal" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box">
+                    <i class="fas fa-times"></i>
+                </div>
+                <h4 class="modal-title">Are you sure?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmText"></p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-danger" href="" id="yesButton">Yes</a>
+                <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal delete video end -->
+
+<!-- footer -->
+<footer th:replace="fragments :: footer('/home')"></footer>
+<!-- /footer -->
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/custom.js}"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<!-- Head -->
+<head th:replace="fragments :: page_head(${pageTitle} + ' | Circle')"></head>
+<!-- /Head -->
+
+<body class="dark">
+
+<!-- Navbar -->
+<div th:replace="fragments :: navigationNoSearch('Multimedia')"></div>
+<!-- /Navbar -->
+
+<div th:if="${message != null}" class="alert alert-success text-center" id="success-alert">
+  [[${message}]]
+</div>
+
+<!-- Content -->
+<div class="content-wrapper new-user">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 col-xs-10 col-sm-10">
+        <h3 class="heading" th:text="${pageTitle}"></h3>
+        <div class="login-window">
+          <form th:action="@{/account/update}" th:object="${user}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{id}"/>
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" class="form-control input-text" th:field="*{firstName}" readonly="readonly">
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" class="form-control" th:field="*{lastName}" readonly="readonly">
+            </div>
+            <div class="form-group">
+              <label for="userName">User Name</label>
+              <input type="text" class="form-control" th:field="*{userName}" readonly="readonly">
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" th:field="*{email}" readonly="readonly">
+            </div>
+            <div class="form-group">
+              <div class="checkbox">
+                <input class="custcheck" type="checkbox" th:field="*{enabled}" disabled="disabled">
+                <label style="margin-top: 6px;" th:for="${#ids.prev('enabled')}">Enabled</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <h5 style="display: inline" class="heading">Role: </h5>
+              <span style="color: #e04171; font-size: 1.1em;">[[${user.role}]]</span>
+            </div>
+            <div class="form-group">
+            <h5 class="heading">Profile picture</h5>
+            <div class="form-group row">
+              <div class="col-lg-8 fileBrowser">
+                <input type="hidden" th:field="*{profileImage}">
+                <input type="file" id="fileImage" name="image" accept="image/jpeg, image/png">
+                <img th:src="@{${user.profileImagePath}}" alt="Image preview" id="thumbnail">
+              </div>
+            </div>
+            </div>
+
+            <div class="row">
+              <div class="col-lg-2">
+                <button type="submit" class="btn btn-cv1">Save</button>
+              </div>
+              <div class="col-lg-2">
+                <button type="button" class="btn btn-cv2" id="cancelButton">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Content -->
+
+
+<!-- footer -->
+<footer th:replace="fragments :: footer('/home')"></footer>
+<!-- /footer -->
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/custom.js}"></script>
+
+</body>
+</html>

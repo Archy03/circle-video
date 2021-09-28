@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org">
+<!-- Head -->
+<head th:replace="fragments :: page_head_guest(${pageTitle})"></head>
+<!-- /Head -->
+
+<body class="single-media dark">
+<!-- Navbar -->
+<div th:replace="fragments :: navigationGuest('Presentations', 'presentations')"></div>
+<!-- /Navbar -->
+
+<div class="content-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-xs-12 col-sm-12">
+                <div class="sv-media">
+                    <iframe th:src="@{${presentation.presentationPath} + '#toolbar=0'}" width="100%" height="600px" frameborder='0'></iframe>
+                </div>
+                <h1 class="heading" th:text="${presentation.title}"></h1>
+                <div class="author">
+                    <a th:href="@{|/guest/presentations/userPresentations/${presentation.user.id}|}" >
+                        <img th:src="${presentation.user.profileImagePath}" class="sv-avatar" alt="Profile image">
+                    </a>
+                    <div class="sv-name">
+                        <div><a th:href="@{|/guest/presentations/userPresentations/${presentation.user.id}|}" th:text="${presentation.user.fullUserName}"></a><p th:text="${countPresentationsByUser} + '&nbsp;&nbsp;Presentations'"></p></div>
+                    </div>
+                    <div class="sv-views" id="voteSection"
+                         th:with="ratingLikeSum=${presentation.getLikeRatingSum()},
+                                   ratingDislikeSum=${presentation.getDislikeRatingSum()},
+                                   calculatedPercent=${presentation.calculatedPercent()}">
+                        <div class="sv-views-progress" data-toggle="tooltip" data-placement="top" th:title="${presentation.calculatedPercent()} + '%'">
+                            <div class="sv-views-progress-bar" th:style="'width: ' + ${calculatedPercent} + '%' + ';'" ></div>
+                        </div>
+                        <div class="sv-views-stats">
+                            <a class="rating-arrow like-arrow">
+                                <i class="fas fa-thumbs-up"></i>
+                            </a>
+                            <span class="rating-value-like" th:text="${ratingLikeSum}"
+                                  th:classappend="${ratingLikeSum == 0} ? 'rating-value-no' : 'rating-value-positive'"></span>
+                            <a class="rating-arrow dislike-arrow" >
+                                <i class="fas fa-thumbs-down"></i>
+                            </a>
+                            <span class="rating-value-dislike" th:text="${ratingDislikeSum}"
+                                  th:classappend="${ratingDislikeSum == 0} ? 'rating-value-no' : 'rating-value-negative'"></span>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="info">
+                    <h4>Description:</h4>
+                    <p th:text="${presentation.description}"></p>
+                    <h4>Category:</h4>
+                    <p class="sv-tags">
+                        <span th:text="${presentation.category}" style="color: #b3b3b3"></span>
+                    </p>
+                    <div class="row date-lic">
+                        <div class="col-lg-6">
+                            <h4>Posted:</h4>&nbsp;
+                            <p th:text="${#temporals.format(presentation.createdAt, 'dd-MMM-YYY &bull; HH:mm')}"></p>
+                        </div>
+                    </div>
+
+                    <!-- Comments container -->
+                    <div class="comments">
+                        <div class="reply-comment">
+                            <div class="rc-header" id="commentCount">
+                                <i class="far fa-comment"></i>
+                                <span class="semibold" th:text="${countComments}"></span>
+                                <span>&nbsp;Comments</span>
+                            </div>
+                            <div class="rc-ava">
+                                <img th:src="@{/images/profile-icon.png}" alt="Profile image">
+                            </div>
+                            <div class="rc-comment">
+                                <form action="javascript:void(0)" id="commentForm">
+                                    <textarea rows="3" placeholder="You must be logged in to leave a comment!" readonly></textarea >
+                                    <button type="submit" disabled>
+                                        <i class="cv fas fa-paper-plane"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <!-- Comments header -->
+                        <div class="comments-list" id="comment_header">
+                            <div class="cl-header" >
+                                <div class="c-nav">
+                                    <ul class="list-inline">
+                                        <li><a data-comment-sort-type="newest" th:attr="data-action='commentSort', data-href=@{|/guest/presentations/watch/${presentation.id}?commentSort=newest|}" id="newest" class="disabledLink active">Newest Comments</a></li>
+                                        <li><a data-comment-sort-type="oldest" th:attr="data-action='commentSort', data-href=@{|/guest/presentations/watch/${presentation.id}?commentSort=oldest|}" id="oldest" >Oldest Comments</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- Comments list -->
+                            <div id="commentList">
+                                <p class="noRecords" th:if="${listAllCommentsByPresentation.isEmpty()}">Be the first to comment!</p>
+                            <div class="cl-comment" th:each="comment : ${listAllCommentsByPresentation}">
+                                <div class="cl-avatar"><a th:href="@{|/guest/presentations/userPresentations/${comment.user.id}|}">
+                                    <img th:src="@{${comment.user.profileImagePath}}" alt="Profile image"></a></div>
+                                <div class="cl-comment-text">
+                                    <div class="cl-name-date">
+                                        <a th:href="@{|/guest/presentations/userPresentations/${comment.user.id}|}" th:text="${comment.user.getFullUserName()}">
+                                        </a>&nbsp;&nbsp;<span th:text="${#temporals.format(comment.createdAt, 'dd-MMM-YYY &bull; HH:mm')}"></span></div>
+                                    <div class="cl-text" th:text="${comment.text}"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            </div>
+                            <!-- END Comments list -->
+                        </div>
+                        <!-- END Comments header -->
+                    </div>
+                    <!-- END Comments container -->
+                </div>
+            </div>
+
+            <!-- right column -->
+            <div class="col-lg-4 col-xs-12 col-sm-12">
+                <!-- up next -->
+                <div class="caption">
+                    <div class="left">
+                        <span style="color: #a5a5a5" >More presentations</span >
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="list" id="listRightMedias">
+                    <div class="h-media row" th:each="presentation : ${listAllPresentations}">
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="v-img">
+                                <a th:href="@{|/guest/presentations/watch/${presentation.id}|}">
+                                    <img th:src="@{${presentation.presentationThumbnailPath}}" alt="Presentation thumbnail"></a>
+                                <div class="time" th:text="${presentation.category}"></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="v-desc">
+                                <a th:href="@{|/guest/presentations/watch/${presentation.id}|}" th:text="${presentation.title}"></a>
+                            </div>
+                            <div class="v-views">
+                                <a th:href="@{|/guest/presentations/userPresentations/${presentation.getUser().getId()}|}">
+                                    <span th:text="${presentation.user.fullUserName}"></span>
+                                </a>
+                                <p th:text="${#temporals.format(presentation.createdAt, 'dd-MMM-YYY &bull; HH:mm')}"></p>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <!-- END up next -->
+                <!-- load more -->
+                <div class="loadmore">
+                    <a>Show more Presentations</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- footer -->
+<footer th:replace="fragments :: footer('/guest/home')"></footer>
+<!-- /footer -->
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/custom.js}"></script>
+
+</body>
+</html>

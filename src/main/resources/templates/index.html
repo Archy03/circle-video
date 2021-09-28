@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="eng" xmlns:th="http://www.thymeleaf.org" >
+<head>
+  <meta charset="UTF-8">
+  <title>Circle Media</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link th:href="@{/css/home.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+  <div class="heading" >Welcome [[${#authentication.principal.fullName}]]!<br>Where do You want to go?</div>
+  <div th:class="${#authentication.principal.roleName == 'Admin' ? 'pages' : 'pagesUser'}">
+    <a th:href="@{/pictures}">
+      <i class="fas fa-image"></i>
+      <h1 class="page-label">Picture</h1>
+    </a>
+    <a th:href="@{/presentations}">
+      <i class="fas fa-file-powerpoint"></i>
+      <h1 class="page-label">Presentation</h1>
+    </a>
+    <a th:href="@{/videos}">
+      <i class="fas fa-video"></i>
+      <h1 class="page-label">Video</h1>
+    </a>
+    <a th:if="${#authentication.principal.roleName == 'Admin'}" th:href="@{/users}">
+      <i class="fas fa-users"></i>
+      <h1 class="page-label">Users</h1>
+    </a>
+  </div>
+</div>
+</body>
+</html>
